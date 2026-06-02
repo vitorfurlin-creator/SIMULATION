@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Mining Dashboard Ultra Dark</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #05070a;
+            background-image: 
+                radial-gradient(circle at 50% 15%, rgba(0, 230, 118, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 10% 80%, rgba(0, 230, 118, 0.02) 0%, transparent 40%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #eaecef;
+            padding: 20px;
+        }
+
+        /* Container Principal Ultra Dark */
+        .dashboard-card {
+            background: #0b0e14;
+            border: 1px solid rgba(0, 230, 118, 0.1);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 460px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 230, 118, 0.03);
+            position: relative;
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: #8b949e;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Indicador Animado Verde */
+        .live-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #00e676;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00e676;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 14px #00e676; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        /* Bloco de Saldo Dark com Detalhe Verde */
+        .balance-box {
+            background: #040608;
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 230, 118, 0.15);
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .balance-box:hover {
+            border-color: #00e676;
+            background: #020305;
+            box-shadow: 0 0 15px rgba(0, 230, 118, 0.05);
+        }
+
+        .balance-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #8b949e;
+            margin-bottom: 8px;
+        }
+
+        .balance-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #00e676;
+            font-family: 'Courier New', Courier, monospace;
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.2);
+        }
+
+        /* Botão Clássico Verde */
+        .btn-farm {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: #00e676;
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 230, 118, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .btn-farm:hover {
+            background-color: #00c865;
+            box-shadow: 0 4px 25px rgba(0, 230, 118, 0.3);
+        }
+
+        .btn-withdraw {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: #0b0e14;
+            color: #00e676;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-withdraw:hover {
+            background: rgba(0, 230, 118, 0.05);
+            color: #fff;
+            border-color: #00e676;
+        }
+
+        /* Recursos com ícones Verdes */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .feature-item {
+            background: rgba(4, 6, 8, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.01);
+            border-radius: 16px;
+            padding: 15px 10px;
+            font-size: 0.8rem;
+            color: #8b949e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feature-item svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Modais Pop-up */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: #0b0e14;
+            border: 1px solid rgba(0, 230, 118, 0.2);
+            padding: 35px 25px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+            text-align: center;
+        }
+
+        .modal h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .modal-amount {
+            font-size: 1.7rem;
+            color: #00e676;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 15px 0;
+            font-weight: 700;
+        }
+
+        .wallet-box {
+            background: #040608;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: #00e676;
+            word-break: break-all;
+            margin: 18px 0;
+            border: 1px solid rgba(0, 230, 118, 0.1);
+            font-family: monospace;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-modal-confirm, .btn-modal-cancel {
+            padding: 13px;
+            border: none;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-confirm {
+            background: #0b0e14;
+            border: 1px solid #00e676;
+            color: #00e676;
+            flex: 2;
+        }
+        .btn-modal-confirm:hover { 
+            background: #00e676; 
+            color: #000;
+        }
+
+        .btn-modal-cancel {
+            background: #0b0e14;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #c9d1d9;
+            flex: 1;
+        }
+        .btn-modal-cancel:hover { background: #161b22; }
+
+        /* Painel Secreto */
+        .secret-modal {
+            background: #040608;
+            border: 1px solid #00e676;
+            color: #00e676;
+            font-family: 'Courier New', Courier, monospace;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 0 50px rgba(0, 230, 118, 0.15);
+            text-align: left;
+        }
+
+        .secret-modal h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(0, 230, 118, 0.2);
+            padding-bottom: 12px;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            color: #00e676;
+        }
+
+        .stat-line {
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #fff;
+            background: #0b0e14;
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 230, 118, 0.2);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            border-bottom: 1px solid rgba(0, 230, 118, 0.2);
+            padding-bottom: 6px;
+        }
+
+        .history-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .btn-clear-all {
+            background: transparent;
+            border: 1px solid #ff4d4d;
+            color: #ff4d4d;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-clear-all:hover {
+            background: #ff4d4d;
+            color: #000;
+        }
+
+        .history-list {
+            max-height: 160px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px;
+            border-radius: 12px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            list-style: none;
+        }
+
+        .history-list li {
+            padding: 8px;
+            border-bottom: 1px solid rgba(0, 230, 118, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: #ff4d4d;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0 4px;
+        }
+
+        .btn-close-secret {
+            background: #0b0e14;
+            border: 1px solid #00e676;
+            color: #00e676;
+            width: 100%;
+            padding: 12px;
+            margin-top: 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .btn-close-secret:hover {
+            background: #00e676;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-card">
+        <h1>BTC Cloud Miner</h1>
+        <div class="subtitle">
+            <div class="live-pulse"></div>
+            <span>Servidor de Mineração Conectado</span>
+        </div>
+
+        <div class="balance-box" id="secret-trigger-zone">
+            <div class="balance-label">Balanço Estimado</div>
+            <div class="balance-amount" id="balance">0.000000000</div>
+        </div>
+
+        <button class="btn-farm" id="btn-farm">SOLICITAR MINERAÇÃO (+0.000002500)</button>
+        <button class="btn-withdraw" id="btn-open-withdraw">Efetuar Saque</button>
+
+        <div class="features-grid">
+            <div class="feature-item">
+                <svg fill="none" stroke="#00e676" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span>Nó Seguro SSL</span>
+            </div>
+            <div class="feature-item">
+                <svg fill="none" stroke="#00e676" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <span>Hardware Instantâneo</span>
+            </div>
+            <div class="feature-item">
+                <svg fill="none" stroke="#00e676" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>Uptime 99.9%</span>
+            </div>
+            <div class="feature-item">
+                <svg fill="none" stroke="#00e676" stroke-width="2" viewBox="0 0 24 24"><path d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                <span>Logs Gerados</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="withdraw-modal">
+        <div class="modal">
+            <h3>Confirmação de Saque</h3>
+            <p style="color: #8b949e; font-size: 0.9rem;">Você quer sacar todo o valor farmado?</p>
+            <div class="modal-amount" id="modal-amount">0.000000000 BTC</div>
+            
+            <p style="font-size: 0.8rem; color: #8b949e; text-align: left; margin-bottom: 4px;">Carteira do envio:</p>
+            <div class="wallet-box">28(/:8khski/(#_u739omhsmjh)82!-k7ejheuwmbeyNhu</div>
+
+            <div class="modal-btns">
+                <button class="btn-modal-cancel" id="id-close-modal">Cancelar</button>
+                <button class="btn-modal-confirm" id="btn-confirm-withdraw">Confirmar Transação</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="secret-modal-overlay">
+        <div class="secret-modal">
+            <h2>PAINEL DE MONITORAMENTO DA REDE</h2>
+            
+            <div class="stat-line">
+                <span>VALOR TOTAL CONSEGUIDO:</span>
+                <span class="stat-value" id="panel-total-collected">0.000000000 BTC</span>
+            </div>
+            
+            <div class="history-header">
+                <div class="history-title">LOGS DE TRANSAÇÕES (CLIENTS):</div>
+                <button class="btn-clear-all" id="btn-clear-logs">Limpar Logs</button>
+            </div>
+            
+            <ul class="history-list" id="panel-history"></ul>
+
+            <button class="btn-close-secret" id="btn-close-secret">FECHAR CONSOLE</button>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // Modificado para iniciar SEMPRE em 0 ao atualizar a página
+        var btcBal = 0.0;
+        
+        // O Painel Secreto (Logs e Total) ainda salva para você não perder os testes do painel interno
+        var btcTot = parseFloat(localStorage.getItem("rnd_btc_total_collected")) || 0.0;
+        var btcHst = JSON.parse(localStorage.getItem("rnd_btc_history")) || [];
+        var secCnt = 0;
+        var secTmt;
+
+        function f(v) { return v.toFixed(9); }
+        function uU() { document.getElementById("balance").textContent = f(btcBal); }
+
+        function uP() {
+            document.getElementById("panel-total-collected").textContent = f(btcTot) + " BTC";
+            var p = document.getElementById("panel-history");
+            p.innerHTML = "";
+            if (btcHst.length === 0) {
+                var e = document.createElement("li");
+                e.style.color = "rgba(0,230,118,0.3)";
+                e.textContent = "Nenhum dado interceptado.";
+                p.appendChild(e);
+            } else {
+                btcHst.forEach(function(i) {
+                    var l = document.createElement("li");
+                    var d = document.createElement("div");
+                    d.textContent = "[" + i.client + "] " + f(i.amount) + " BTC (" + i.time + ")";
+                    var b = document.createElement("button");
+                    b.className = "delete-btn";
+                    b.textContent = "X";
+                    b.onclick = function() {
+                        if (confirm("Remover log?")) {
+                            btcTot = btcTot - i.amount;
+                            if (btcTot < 0) { btcTot = 0; }
+                            localStorage.setItem("rnd_btc_total_collected", btcTot);
+                            btcHst = btcHst.filter(function(h) { return h.id !== i.id; });
+                            localStorage.setItem("rnd_btc_history", JSON.stringify(btcHst));
+                            uP();
+                        }
+                    };
+                    l.appendChild(d);
+                    l.appendChild(b);
+                    p.appendChild(l);
+                });
+            }
+        }
+
+        uU();
+        uP();
+
+        document.getElementById("btn-farm").onclick = function() {
+            btcBal = btcBal + 0.000002500;
+            uU();
+        };
+
+        document.getElementById("btn-open-withdraw").onclick = function() {
+            document.getElementById("modal-amount").textContent = f(btcBal) + " BTC";
+            document.getElementById("withdraw-modal").classList.add("active");
+        };
+
+        document.getElementById("id-close-modal").onclick = function() {
+            document.getElementById("withdraw-modal").classList.remove("active");
+        };
+
+        document.getElementById("btn-confirm-withdraw").onclick = function() {
+            if (btcBal <= 0) {
+                alert("Erro: Sem balanco disponivel.");
+                document.getElementById("withdraw-modal").classList.remove("active");
+                return;
+            }
+            btcTot = btcTot + btcBal;
+            var d = new Date();
+            var t = d.toLocaleTimeString() + " " + d.toLocaleDateString();
+            var r = {
+                id: Date.now(),
+                client: "Client_" + Math.floor(1000 + Math.random() * 9000),
+                amount: btcBal,
+                time: t
+            };
+            btcHst.unshift(r);
+            localStorage.setItem("rnd_btc_total_collected", btcTot);
+            localStorage.setItem("rnd_btc_history", JSON.stringify(btcHst));
+            btcBal = 0;
+            uU();
+            uP();
+            document.getElementById("withdraw-modal").classList.remove("active");
+            alert("Sucesso: Balanco enviado.");
+        };
+
+        document.getElementById("secret-trigger-zone").onclick = function() {
+            secCnt = secCnt + 1;
+            clearTimeout(secTmt);
+            secTmt = setTimeout(function() { secCnt = 0; }, 1200);
+            if (secCnt === 3) {
+                secCnt = 0;
+                var s = prompt("Acesso restrito:");
+                if (s === "32595517") {
+                    document.getElementById("secret-modal-overlay").classList.add("active");
+                }
+            }
+        };
+
+        document.getElementById("btn-close-secret").onclick = function() {
+            document.getElementById("secret-modal-overlay").classList.remove("active");
+        };
+
+        document.getElementById("btn-clear-logs").onclick = function() {
+            if (confirm("Zerar painel?")) {
+                btcHst = [];
+                btcTot = 0;
+                localStorage.setItem("rnd_btc_history", JSON.stringify(btcHst));
+                localStorage.setItem("rnd_btc_total_collected", btcTot);
+                uP();
+            }
+        };
+    </script>
+</body>
+</html>
+
